@@ -1,16 +1,25 @@
+locals {
+  url_ports = {
+    default = 30201
+    dev     = 30202
+    preprod = 30203
+    prod    = 30204
+  }
+}
+
 resource "kubernetes_namespace" "mynamespace" {
   metadata {
-    name = "fab-namespace"
+    name = "${terraform.workspace}-nginx-ns"
   }
 }
 
 resource "kubernetes_deployment" "test" {
   metadata {
-    name      = "nginx"
+    name      = "nginx-dp"
     namespace = kubernetes_namespace.mynamespace.metadata.0.name
   }
   spec {
-    replicas = 2
+    replicas = terraform.workspace == "prod" ? 3 : 2
     selector {
       match_labels = {
         app = "MyTestApp"
@@ -36,7 +45,7 @@ resource "kubernetes_deployment" "test" {
 }
 resource "kubernetes_service" "test" {
   metadata {
-    name      = "nginx"
+    name      = "nginx-svc"
     namespace = kubernetes_namespace.mynamespace.metadata.0.name
   }
   spec {
@@ -45,7 +54,7 @@ resource "kubernetes_service" "test" {
     }
     type = "NodePort"
     port {
-      node_port   = 30201
+      node_port   = local.url_ports["${terraform.workspace}"]
       port        = 80
       target_port = 80
     }

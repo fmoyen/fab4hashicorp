@@ -4,6 +4,8 @@ resource "kubernetes_namespace" "demo" {
   }
 }
 
+# NGINX EXAMPLE
+/*
 resource "kubernetes_deployment" "nginx" {
   metadata {
     name      = "nginx-dp"
@@ -51,7 +53,9 @@ resource "kubernetes_service" "nginx" {
     }
   }
 }
+*/
 
+# UBI9 DEPLOYMENT
 resource "kubernetes_deployment" "ubi9" {
   metadata {
     name      = "ubi-dp"
@@ -80,4 +84,18 @@ resource "kubernetes_deployment" "ubi9" {
       }
     }
   }
+}
+
+data "kubernetes_resource" "ubipod" {
+  api_version = "v1"
+  kind        = "Pod"
+
+  metadata {
+    name      = "ubi-dp-c78d55fbc-jmv65"
+    namespace = "demo-ns"
+  }
+}
+
+output "podIP" {
+  value = data.kubernetes_resource.ubipod.object.status.podIP
 }

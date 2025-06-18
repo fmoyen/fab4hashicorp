@@ -85,7 +85,7 @@ resource "kubernetes_deployment" "ubi9" {
     }
   }
 }
-
+/*
 data "kubernetes_resource" "ubipod" {
   api_version = "v1"
   kind        = "Pod"
@@ -98,4 +98,13 @@ data "kubernetes_resource" "ubipod" {
 
 output "podIP" {
   value = data.kubernetes_resource.ubipod.object.status.podIP
+}
+*/
+
+data "kubernetes_resources" "ubipod" {
+  api_version    = "v1"
+  kind           = "Pod"
+  namespace      = "demo-ns"
+#  field_selector = "metadata.name=ubi-dp-c78d55fbc-jmv65"
+  field_selector = "status.phase=Running"
 }
